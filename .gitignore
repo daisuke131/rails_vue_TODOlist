@@ -1,6 +1,5 @@
 *.rbc
 capybara-*.html
-# .rspec
 /log
 /tmp
 /db/*.sqlite3
@@ -57,3 +56,4 @@ node_modules/
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+.DS_Store

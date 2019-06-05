@@ -63,16 +63,16 @@
 </script>
 
 <style lang="scss" scoped>
-[v-cloak] {
-  display: none;
-}
+  [v-cloak] {
+    display: none;
+  }
 
-ul {
-  list-style: none;
-  li {
-    span.done {
-      text-decoration: line-through;
+  ul {
+    list-style: none;
+    li {
+      span.done {
+        text-decoration: line-through;
+      }
     }
   }
-}
 </style>
