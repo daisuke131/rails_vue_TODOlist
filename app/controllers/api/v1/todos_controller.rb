@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Api::V1::TodosController < ApplicationController
-  before_action :set_todo, only: [:update, :destroy]
+  before_action :set_todo, only: %i[update destroy]
   def index
     render json: Todo.all.order("created_at DESC")
   end
@@ -18,9 +20,11 @@ class Api::V1::TodosController < ApplicationController
   end
 
   private
+
     def set_todo
       @todo = Todo.find(params[:id])
     end
+
     def todo_params
       params.require(:todo).permit(:body, :done)
     end
