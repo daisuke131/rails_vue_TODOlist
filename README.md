@@ -1,24 +1,49 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+学習した技術を試す為のアプリ。
 
-Things you may want to cover:
+中身自体はrailsでAPI出力、フロントにVuejsを使ったTODOアプリです。
 
-* Ruby version
+いまのところ実装済みの技術
+- Docker
+- CircleCI
 
-* System dependencies
+## development
 
-* Configuration
+### Version
 
-* Database creation
+```
+Ruby version: 2.6.1
+```
 
-* Database initialization
+### Install
 
-* How to run the test suite
+```
+$ bundle install --path vendor/bundle
+$ yarn install --check-files
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+### test command
 
-* Deployment instructions
+```
+$ bundle exec rspec
+```
 
-* ...
+## Docker command
+
+### Dockerコンテナ起動
+```
+$ docker-compose up
+```
+
+### コンテナの作業フォルダ
+```
+$ docker-compose exec app ash
+```
+
+###アプリ起動
+
+```
+# rails s -b 0.0.0.0
+# bin/webpack-dev-server
+```
