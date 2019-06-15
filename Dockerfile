@@ -1,27 +1,8 @@
-# FROM ruby:2.6.1
-
-# ENV LANG=C.UTF-8
-
-# RUN gem install rails
-
-# RUN apt-get update && \
-#     apt-get install -y nodejs mysql-client
-
-# COPY Gemfile /Gemfile
-# COPY Gemfile.lock /Gemfile.lock
-# RUN bundle install --jobs=4 --retry=3
-
-
-
-
-
-
-
 FROM  ruby:2.6.1-alpine3.9
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
     LC_CTYPE="utf-8"
-ENV APP="/app" \
+ENV WORK_DIR="/rails_vue_TODOlist" \
     CONTAINER_ROOT="./" \
     NOKOGIRI_OPTION="--use-system-libraries \
                     --with-xml2-config=/usr/bin/xml2-config \
@@ -54,12 +35,9 @@ RUN apk update \
  && gem install -q -N rails -v 5.2.3 \
  && gem install -q -N nokogiri -v 1.10.2 -- $NOKOGIRI_OPTION \
  && gem install -q -N mysql2 -v 0.5.2
-# WORKDIR $APP
-# COPY Gemfile Gemfile.lock $CONTAINER_ROOT
-COPY Gemfile /Gemfile
-COPY Gemfile.lock /Gemfile.lock
+WORKDIR $WORK_DIR
+COPY Gemfile Gemfile.lock $CONTAINER_ROOT
 RUN bundle install --jobs=4 --retry=3
-RUN yarn install --check-files
 ENV RAILS_SERVE_STATIC_FILES=true \
     PORT=$SERVER_PORT \
     TERM=xterm
