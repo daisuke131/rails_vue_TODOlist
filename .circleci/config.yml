@@ -20,26 +20,34 @@ executors:
 
 commands:
   save_code_cache:
+    description: ソースコードをキャッシュ
     steps:
       - save_cache:
-          key: v1-code-cache-{{ .Environment.CIRCLE_SHA1 }}
+          key: v1-code-dependencies-{{ .Environment.CIRCLE_SHA1 }}
           paths: ~/rails_vue_TODOlist
 
   restore_code_cache:
+    description: ソースコードを復元
     steps:
       - restore_cache:
-          key: v1-code-cache-{{ .Environment.CIRCLE_SHA1 }}
+          keys:
+            - v1-code-dependencies-{{ .Environment.CIRCLE_SHA1 }}
+            - v1-code-dependencies-
 
   save_gem_cache:
+    description: bundle installのデータをキャッシュ
     steps:
       - save_cache:
-          key: v1-gem-cache-{{ checksum "Gemfile.lock" }}
+          key: v1-gem-dependencies-{{ checksum "Gemfile.lock" }}
           paths: vendor/bundle
 
   restore_gem_cache:
+    description: bundle installのキャシュがあれば取ってくる
     steps:
       - restore_cache:
-          key: v1-gem-cache-{{ checksum "Gemfile.lock" }}
+          keys:
+            - v1-gem-dependencies-{{ checksum "Gemfile.lock" }}
+            - v1-gem-dependencies-
 
 jobs:
   fetch_source_code:
@@ -62,6 +70,7 @@ jobs:
       - save_gem_cache
 
   rubocop:
+    description: コードチェック
     executor: default
     steps:
       - checkout
@@ -74,20 +83,16 @@ jobs:
             bundle exec rubocop
 
   rspec:
+    description: Rspecテスト
     executor: default
     steps:
       - checkout
       - restore_code_cache
       - restore_gem_cache
       - run:
-          name: Watting stand up database
-          command: |
-            dockerize -wait \
-            tcp://127.0.0.1:3306 -timeout 120s
-      - run:
           name: Database setup
           command: |
-            mv ./config/database.yml.ci  ./config/database.yml
+            mv ./config/database.yml.ci ./config/database.yml
       - run:
           name: Testing DB migration and seed
           command: |
@@ -97,15 +102,34 @@ jobs:
           name: Run RSpec
           command: |
             mkdir /tmp/test-results
-            mkdir -p ~/rspec
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | \
+              circleci tests split --split-by=timings)"
+
             bundle exec rails db:create db:migrate
             gem install bundler -v 2.0.1
-            bundle exec rspec
+
+            bundle exec rspec \
+              --format progress \
+              --format RspecJunitFormatter \
+              --out /tmp/test-results/rspec.xml \
+              --format progress \
+              $TEST_FILES
+
       - store_test_results:
-          path: ~/rspec
+          path: /tmp/test-results
       - store_artifacts:
           path: /tmp/test-results
-          destination: build
+          destination: test-results
+
+  deploy:
+    description: herokuへデプロイ
+    executor: default
+    steps:
+      - checkout
+      - run:
+          name: Deploy Master to Heroku
+          command: |
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
 
 workflows:
   build:
@@ -120,3 +144,10 @@ workflows:
       - rspec:
           requires:
             - bundle_dependencies
+      - deploy:
+          requires:
+            - rubocop
+            - rspec
+          filters:
+            branches:
+              only: master
