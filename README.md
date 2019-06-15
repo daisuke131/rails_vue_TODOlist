@@ -41,7 +41,7 @@ $ docker-compose up
 $ docker-compose exec app ash
 ```
 
-###アプリ起動
+### アプリ起動
 
 ```
 # rails s -b 0.0.0.0
