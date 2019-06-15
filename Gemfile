@@ -48,6 +48,8 @@ group :development, :test do
   gem "faker"
   gem "pry-byebug"
   gem "rspec-rails"
+  gem "rspec_junit_formatter"
+  gem "rubocop-rails"
   gem "rubocop-rspec"
 end
 
