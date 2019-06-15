@@ -11,18 +11,10 @@ services:
       MYSQL_ROOT_PASSWORD: root
   app:
     build: .
-    # command: >
-    #   bash -c "
-    #     yarn install --check-files &&
-    #     rm -f tmp/pids/server.pid &&
-    #     bundle install --quiet &&
-    #     bundle exec rails db:migrate
-    #   "
     volumes:
-      - ".:/app"
+      - ".:/rails_vue_TODOlist"
     ports:
       - "3000:3000"
     tty: true
     depends_on:
       - mysql
-    # working_dir: "/app"
